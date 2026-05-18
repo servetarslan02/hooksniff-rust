@@ -176,8 +176,7 @@ impl Request {
                             .headers
                             .as_ref()
                             .and_then(|h| h.get("retry-after"))
-                            .and_then(|v| v.to_str().ok())
-                            .and_then(|s| s.parse::<u64>().ok())
+                            .and_then(|v| v.parse::<u64>().ok())
                             .map(Duration::from_secs)
                             .unwrap_or(next_backoff.unwrap());
                         tokio::time::sleep(delay).await;
@@ -267,7 +266,7 @@ impl Request {
         }
 
         if let Some(user_agent) = &conf.user_agent {
-            let value = user_agent.try_into().map_err(Error::generic)?;
+            let value: http1::HeaderValue = user_agent.try_into().map_err(Error::generic)?;
             request_headers.insert(USER_AGENT, value.clone());
             request_headers.insert("x-hooksniff-sdk", value);
         }

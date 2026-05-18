@@ -531,3 +531,10 @@ pub use self::{
     message_attempt_endpoint_out::MessageAttemptEndpointOut, message_events_out::MessageEventsOut,
     validation_error::ValidationError,
 };
+pub mod publish_event_in;
+pub mod publish_event_response;
+pub mod stream_subscription_out;
+
+pub use publish_event_in::PublishEventIn;
+pub use publish_event_response::PublishEventResponse;
+pub use stream_subscription_out::StreamSubscriptionOut;

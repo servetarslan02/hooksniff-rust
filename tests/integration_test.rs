@@ -71,6 +71,7 @@ mod tests {
 
         let http_err = hooksniff::error::Error::Http(hooksniff::error::HttpErrorContent {
             status: http02::StatusCode::BAD_REQUEST,
+            headers: None,
             payload: None,
         });
         assert!(format!("{http_err}").contains("400"));

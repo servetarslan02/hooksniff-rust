@@ -66,7 +66,7 @@ impl Webhook {
         self.verify_inner(payload, headers, /* enforce_tolerance */ false)
     }
 
-    fn verify_inner<HM: HeaderMap>(
+    pub(crate) fn verify_inner<HM: HeaderMap>(
         &self,
         payload: &[u8],
         headers: &HM,

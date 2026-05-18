@@ -142,7 +142,6 @@ impl HookSniff {
         ApiKey::new(&self.cfg)
     }
 
-    }
 
     pub fn authentication(&self) -> Authentication<'_> {
         Authentication::new(&self.cfg)

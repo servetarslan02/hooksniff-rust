@@ -6,6 +6,3 @@ pub type MessageAttemptListOptions = super::MessageAttemptListByMsgOptions;
 pub type ListOptions = super::MessageAttemptListAttemptedDestinationsOptions;
 #[deprecated = "Use AppUsageStatsIn instead"]
 pub type AggregateAppStatsOptions = super::AppUsageStatsIn;
-
-#[deprecated]
-#[derive(Default)]

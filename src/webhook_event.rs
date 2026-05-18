@@ -207,21 +207,21 @@ impl WebhookEvent {
     }
 }
 
-impl super::Webhook {
+impl crate::webhooks::Webhook {
     /// Verify the webhook signature and parse the payload into a [`WebhookEvent`].
     ///
     /// Returns the parsed `WebhookEvent` on success, or a [`WebhookError`] if
     /// the signature is invalid, the timestamp is outside tolerance, or the
     /// payload cannot be parsed.
-    pub fn verify_and_parse<HM: super::HeaderMap>(
+    pub fn verify_and_parse<HM: crate::webhooks::HeaderMap>(
         &self,
         payload: &[u8],
         headers: &HM,
-    ) -> Result<WebhookEvent, super::WebhookError> {
+    ) -> Result<WebhookEvent, crate::webhooks::WebhookError> {
         self.verify_inner(payload, headers, true)?;
 
         let event: WebhookEvent =
-            serde_json::from_slice(payload).map_err(|_| super::WebhookError::InvalidPayload)?;
+            serde_json::from_slice(payload).map_err(|_| crate::webhooks::WebhookError::InvalidPayload)?;
 
         Ok(event)
     }
@@ -231,15 +231,15 @@ impl super::Webhook {
     ///
     /// WARNING: This function does not check the signature's timestamp.
     /// We recommend using [`verify_and_parse`](Self::verify_and_parse) instead.
-    pub fn verify_and_parse_ignoring_timestamp<HM: super::HeaderMap>(
+    pub fn verify_and_parse_ignoring_timestamp<HM: crate::webhooks::HeaderMap>(
         &self,
         payload: &[u8],
         headers: &HM,
-    ) -> Result<WebhookEvent, super::WebhookError> {
+    ) -> Result<WebhookEvent, crate::webhooks::WebhookError> {
         self.verify_inner(payload, headers, false)?;
 
         let event: WebhookEvent =
-            serde_json::from_slice(payload).map_err(|_| super::WebhookError::InvalidPayload)?;
+            serde_json::from_slice(payload).map_err(|_| crate::webhooks::WebhookError::InvalidPayload)?;
 
         Ok(event)
     }
@@ -247,15 +247,15 @@ impl super::Webhook {
     /// Verify the webhook signature and parse into a [`TypedWebhookEvent`].
     ///
     /// Returns a strongly-typed event enum variant on success.
-    pub fn verify_and_parse_typed<HM: super::HeaderMap>(
+    pub fn verify_and_parse_typed<HM: crate::webhooks::HeaderMap>(
         &self,
         payload: &[u8],
         headers: &HM,
-    ) -> Result<TypedWebhookEvent, super::WebhookError> {
+    ) -> Result<TypedWebhookEvent, crate::webhooks::WebhookError> {
         self.verify_inner(payload, headers, true)?;
 
         let event: TypedWebhookEvent =
-            serde_json::from_slice(payload).map_err(|_| super::WebhookError::InvalidPayload)?;
+            serde_json::from_slice(payload).map_err(|_| crate::webhooks::WebhookError::InvalidPayload)?;
 
         Ok(event)
     }
