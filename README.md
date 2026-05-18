@@ -26,7 +26,7 @@ Rust client library for the [HookSniff](https://hooksniff.vercel.app) webhook de
 
 ```toml
 [dependencies]
-hooksniff = "1.3"
+hooksniff = "1.4"
 ```
 
 ## Quick Start

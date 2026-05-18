@@ -1,6 +1,6 @@
 [package]
 name = "hooksniff"
-version = "1.3.0"
+version = "1.4.0"
 authors = ["HookSniff Inc. <oss@hooksniff.com>"]
 edition = "2021"
 description = "HookSniff webhooks API client and webhook verification library"
