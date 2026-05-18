@@ -268,7 +268,8 @@ impl Request {
 
         if let Some(user_agent) = &conf.user_agent {
             let value = user_agent.try_into().map_err(Error::generic)?;
-            request_headers.insert(USER_AGENT, value);
+            request_headers.insert(USER_AGENT, value.clone());
+            request_headers.insert("x-hooksniff-sdk", value);
         }
 
         for (k, v) in self.header_params {
