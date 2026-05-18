@@ -24,6 +24,7 @@ mod request;
 pub mod webhooks;
 pub mod webhook_event;
 pub mod response_metadata;
+pub mod config;
 
 pub(crate) use connector::{make_connector, Connector};
 
