@@ -26,7 +26,21 @@ impl Error {
         Self::Generic(format!("{err:?}"))
     }
 
-    pub(crate) async fn from_response(status_code: http1::StatusCode, body: Incoming) -> Self {
+    pub(crate) async fn from_response(
+        status_code: http1::StatusCode,
+        body: Incoming,
+        headers: Option<&http1::HeaderMap>,
+    ) -> Self {
+        let header_map = headers.map(|h| {
+            let mut map = std::collections::HashMap::new();
+            for (k, v) in h.iter() {
+                if let Ok(val) = v.to_str() {
+                    map.insert(k.as_str().to_string(), val.to_string());
+                }
+            }
+            map
+        });
+
         match body.collect().await {
             Ok(collected) => {
                 let bytes = collected.to_bytes();
@@ -34,11 +48,13 @@ impl Error {
                     Self::Validation(HttpErrorContent {
                         status: http02::StatusCode::UNPROCESSABLE_ENTITY,
                         payload: serde_json::from_slice(&bytes).ok(),
+                        headers: header_map,
                     })
                 } else {
                     Error::Http(HttpErrorContent {
                         status: http1_to_02_status_code(status_code),
                         payload: serde_json::from_slice(&bytes).ok(),
+                        headers: header_map,
                     })
                 }
             }
@@ -70,4 +86,5 @@ impl std::error::Error for Error {}
 pub struct HttpErrorContent<T> {
     pub status: http02::StatusCode,
     pub payload: Option<T>,
+    pub headers: Option<std::collections::HashMap<String, String>>,
 }

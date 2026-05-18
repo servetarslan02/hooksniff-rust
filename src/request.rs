@@ -114,7 +114,7 @@ impl Request {
 
         let retry_schedule = match &conf.retry_schedule {
             Some(schedule) => schedule,
-            None => &std::iter::successors(Some(Duration::from_millis(20)), |last_backoff| {
+            None => &std::iter::successors(Some(Duration::from_secs(1)), |last_backoff| {
                 Some(MAX_BACKOFF.min(*last_backoff * 2))
             })
             .take(conf.num_retries as usize)
@@ -134,7 +134,8 @@ impl Request {
 
             let status = response.status();
             if !status.is_success() {
-                Err(Error::from_response(status, response.into_body()).await)
+                let headers = response.headers().clone();
+                Err(Error::from_response(status, response.into_body(), Some(&headers)).await)
             } else if no_return_type {
                 Ok(None)
             } else {
@@ -163,15 +164,42 @@ impl Request {
             match res {
                 Ok(result) => return Ok(result),
                 e @ Err(Error::Validation(_)) => return e,
-                Err(Error::Http(err)) if err.status.as_u16() < 500 => return Err(Error::Http(err)),
+                Err(Error::Http(err)) => {
+                    let status = err.status.as_u16();
+
+                    // 429 Rate Limit — respect Retry-After header
+                    if status == 429 {
+                        if next_backoff.is_none() {
+                            return Err(Error::Http(err));
+                        }
+                        let delay = err
+                            .headers
+                            .as_ref()
+                            .and_then(|h| h.get("retry-after"))
+                            .and_then(|v| v.to_str().ok())
+                            .and_then(|s| s.parse::<u64>().ok())
+                            .map(Duration::from_secs)
+                            .unwrap_or(next_backoff.unwrap());
+                        tokio::time::sleep(delay).await;
+                    } else if status < 500 {
+                        // 4xx (not 429) — no retry
+                        return Err(Error::Http(err));
+                    } else {
+                        // 5xx Server Error — exponential backoff
+                        if next_backoff.is_none() {
+                            return Err(Error::Http(err));
+                        }
+                        tokio::time::sleep(next_backoff.unwrap()).await;
+                    }
+                }
                 e @ Err(_) => {
                     if next_backoff.is_none() {
                         return e;
                     }
+                    tokio::time::sleep(next_backoff.unwrap()).await;
                 }
             }
 
-            tokio::time::sleep(next_backoff.expect("next_backoff is always Some")).await;
             retry_count += 1;
 
             request
