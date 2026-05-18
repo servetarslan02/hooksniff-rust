@@ -14,7 +14,7 @@ impl<'a> Team<'a> {
 
     pub async fn list(&self, options: Option<TeamListOptions>) -> Result<Vec<TeamOut>> {
         let TeamListOptions { limit, iterator, order } = options.unwrap_or_default();
-        crate::request::Request::new(http1::Method::GET, "/v1/team")
+        crate::request::Request::new(http1::Method::GET, "/v1/teams")
             .with_optional_query_param("limit", limit)
             .with_optional_query_param("iterator", iterator)
             .with_optional_query_param("order", order)

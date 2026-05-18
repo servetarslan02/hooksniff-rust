@@ -19,7 +19,7 @@ impl<'a> Schema<'a> {
 
     pub async fn list(&self, options: Option<SchemaListOptions>) -> Result<ListResponseSchemaOut> {
         let SchemaListOptions { limit, iterator, order } = options.unwrap_or_default();
-        crate::request::Request::new(http1::Method::GET, "/v1/schema")
+        crate::request::Request::new(http1::Method::GET, "/v1/schemas")
             .with_optional_query_param("limit", limit)
             .with_optional_query_param("iterator", iterator)
             .with_optional_query_param("order", order)
@@ -28,20 +28,20 @@ impl<'a> Schema<'a> {
 
     pub async fn create(&self, schema_in: SchemaIn, options: Option<SchemaCreateOptions>) -> Result<SchemaOut> {
         let SchemaCreateOptions { idempotency_key } = options.unwrap_or_default();
-        crate::request::Request::new(http1::Method::POST, "/v1/schema")
+        crate::request::Request::new(http1::Method::POST, "/v1/schemas")
             .with_optional_header_param("idempotency-key", idempotency_key)
             .with_body_param(schema_in)
             .execute(self.cfg).await
     }
 
     pub async fn get(&self, schema_id: String) -> Result<SchemaOut> {
-        crate::request::Request::new(http1::Method::GET, "/v1/schema/{schema_id}")
+        crate::request::Request::new(http1::Method::GET, "/v1/schemas/{schema_id}")
             .with_path_param("schema_id", schema_id)
             .execute(self.cfg).await
     }
 
     pub async fn delete(&self, schema_id: String) -> Result<()> {
-        crate::request::Request::new(http1::Method::DELETE, "/v1/schema/{schema_id}")
+        crate::request::Request::new(http1::Method::DELETE, "/v1/schemas/{schema_id}")
             .with_path_param("schema_id", schema_id)
             .returns_nothing()
             .execute(self.cfg).await

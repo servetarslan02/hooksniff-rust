@@ -19,7 +19,7 @@ impl<'a> ApiKey<'a> {
 
     pub async fn list(&self, options: Option<ApiKeyListOptions>) -> Result<ListResponseApiKeyOut> {
         let ApiKeyListOptions { limit, iterator, order } = options.unwrap_or_default();
-        crate::request::Request::new(http1::Method::GET, "/v1/api-key")
+        crate::request::Request::new(http1::Method::GET, "/v1/api-keys")
             .with_optional_query_param("limit", limit)
             .with_optional_query_param("iterator", iterator)
             .with_optional_query_param("order", order)
@@ -28,20 +28,20 @@ impl<'a> ApiKey<'a> {
 
     pub async fn create(&self, api_key_in: ApiKeyIn, options: Option<ApiKeyCreateOptions>) -> Result<ApiKeyOut> {
         let ApiKeyCreateOptions { idempotency_key } = options.unwrap_or_default();
-        crate::request::Request::new(http1::Method::POST, "/v1/api-key")
+        crate::request::Request::new(http1::Method::POST, "/v1/api-keys")
             .with_optional_header_param("idempotency-key", idempotency_key)
             .with_body_param(api_key_in)
             .execute(self.cfg).await
     }
 
     pub async fn get(&self, key_id: String) -> Result<ApiKeyOut> {
-        crate::request::Request::new(http1::Method::GET, "/v1/api-key/{key_id}")
+        crate::request::Request::new(http1::Method::GET, "/v1/api-keys/{key_id}")
             .with_path_param("key_id", key_id)
             .execute(self.cfg).await
     }
 
     pub async fn delete(&self, key_id: String) -> Result<()> {
-        crate::request::Request::new(http1::Method::DELETE, "/v1/api-key/{key_id}")
+        crate::request::Request::new(http1::Method::DELETE, "/v1/api-keys/{key_id}")
             .with_path_param("key_id", key_id)
             .returns_nothing()
             .execute(self.cfg).await

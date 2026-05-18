@@ -14,7 +14,7 @@ impl<'a> Notification<'a> {
 
     pub async fn list(&self, options: Option<NotificationListOptions>) -> Result<ListResponseNotificationOut> {
         let NotificationListOptions { limit, iterator, order } = options.unwrap_or_default();
-        crate::request::Request::new(http1::Method::GET, "/v1/notification")
+        crate::request::Request::new(http1::Method::GET, "/v1/notifications")
             .with_optional_query_param("limit", limit)
             .with_optional_query_param("iterator", iterator)
             .with_optional_query_param("order", order)
@@ -22,7 +22,7 @@ impl<'a> Notification<'a> {
     }
 
     pub async fn mark_read(&self, notification_id: String) -> Result<()> {
-        crate::request::Request::new(http1::Method::POST, "/v1/notification/{notification_id}/read")
+        crate::request::Request::new(http1::Method::POST, "/v1/notifications/{notification_id}/read")
             .with_path_param("notification_id", notification_id)
             .returns_nothing()
             .execute(self.cfg).await

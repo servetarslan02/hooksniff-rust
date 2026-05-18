@@ -43,7 +43,7 @@ impl<'a> OperationalWebhookEndpoint<'a> {
             order,
         } = options.unwrap_or_default();
 
-        crate::request::Request::new(http1::Method::GET, "/v1/operational-webhook/endpoint")
+        crate::request::Request::new(http1::Method::GET, "/v1/operational-webhooks")
             .with_optional_query_param("limit", limit)
             .with_optional_query_param("iterator", iterator)
             .with_optional_query_param("order", order)
@@ -60,7 +60,7 @@ impl<'a> OperationalWebhookEndpoint<'a> {
         let OperationalWebhookEndpointCreateOptions { idempotency_key } =
             options.unwrap_or_default();
 
-        crate::request::Request::new(http1::Method::POST, "/v1/operational-webhook/endpoint")
+        crate::request::Request::new(http1::Method::POST, "/v1/operational-webhooks")
             .with_optional_header_param("idempotency-key", idempotency_key)
             .with_body_param(operational_webhook_endpoint_in)
             .execute(self.cfg)
@@ -71,7 +71,7 @@ impl<'a> OperationalWebhookEndpoint<'a> {
     pub async fn get(&self, endpoint_id: String) -> Result<OperationalWebhookEndpointOut> {
         crate::request::Request::new(
             http1::Method::GET,
-            "/v1/operational-webhook/endpoint/{endpoint_id}",
+            "/v1/operational-webhooks/{endpoint_id}",
         )
         .with_path_param("endpoint_id", endpoint_id)
         .execute(self.cfg)
@@ -86,7 +86,7 @@ impl<'a> OperationalWebhookEndpoint<'a> {
     ) -> Result<OperationalWebhookEndpointOut> {
         crate::request::Request::new(
             http1::Method::PUT,
-            "/v1/operational-webhook/endpoint/{endpoint_id}",
+            "/v1/operational-webhooks/{endpoint_id}",
         )
         .with_path_param("endpoint_id", endpoint_id)
         .with_body_param(operational_webhook_endpoint_update)
@@ -98,7 +98,7 @@ impl<'a> OperationalWebhookEndpoint<'a> {
     pub async fn delete(&self, endpoint_id: String) -> Result<()> {
         crate::request::Request::new(
             http1::Method::DELETE,
-            "/v1/operational-webhook/endpoint/{endpoint_id}",
+            "/v1/operational-webhooks/{endpoint_id}",
         )
         .with_path_param("endpoint_id", endpoint_id)
         .returns_nothing()
@@ -113,7 +113,7 @@ impl<'a> OperationalWebhookEndpoint<'a> {
     ) -> Result<OperationalWebhookEndpointHeadersOut> {
         crate::request::Request::new(
             http1::Method::GET,
-            "/v1/operational-webhook/endpoint/{endpoint_id}/headers",
+            "/v1/operational-webhooks/{endpoint_id}/headers",
         )
         .with_path_param("endpoint_id", endpoint_id)
         .execute(self.cfg)
@@ -128,7 +128,7 @@ impl<'a> OperationalWebhookEndpoint<'a> {
     ) -> Result<()> {
         crate::request::Request::new(
             http1::Method::PUT,
-            "/v1/operational-webhook/endpoint/{endpoint_id}/headers",
+            "/v1/operational-webhooks/{endpoint_id}/headers",
         )
         .with_path_param("endpoint_id", endpoint_id)
         .with_body_param(operational_webhook_endpoint_headers_in)
@@ -147,7 +147,7 @@ impl<'a> OperationalWebhookEndpoint<'a> {
     ) -> Result<OperationalWebhookEndpointSecretOut> {
         crate::request::Request::new(
             http1::Method::GET,
-            "/v1/operational-webhook/endpoint/{endpoint_id}/secret",
+            "/v1/operational-webhooks/{endpoint_id}/secret",
         )
         .with_path_param("endpoint_id", endpoint_id)
         .execute(self.cfg)
@@ -168,7 +168,7 @@ impl<'a> OperationalWebhookEndpoint<'a> {
 
         crate::request::Request::new(
             http1::Method::POST,
-            "/v1/operational-webhook/endpoint/{endpoint_id}/secret/rotate",
+            "/v1/operational-webhooks/{endpoint_id}/secret/rotate",
         )
         .with_path_param("endpoint_id", endpoint_id)
         .with_optional_header_param("idempotency-key", idempotency_key)

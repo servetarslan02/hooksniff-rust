@@ -38,7 +38,7 @@ impl<'a> Inbound<'a> {
             order,
         } = options.unwrap_or_default();
 
-        crate::request::Request::new(http1::Method::GET, "/v1/inbound")
+        crate::request::Request::new(http1::Method::GET, "/v1/inbound/configs")
             .with_optional_query_param("limit", limit)
             .with_optional_query_param("iterator", iterator)
             .with_optional_query_param("order", order)
@@ -54,7 +54,7 @@ impl<'a> Inbound<'a> {
     ) -> Result<InboundConfigOut> {
         let InboundCreateOptions { idempotency_key } = options.unwrap_or_default();
 
-        crate::request::Request::new(http1::Method::POST, "/v1/inbound")
+        crate::request::Request::new(http1::Method::POST, "/v1/inbound/configs")
             .with_optional_header_param("idempotency-key", idempotency_key)
             .with_body_param(inbound_config_in)
             .execute(self.cfg)
@@ -65,7 +65,7 @@ impl<'a> Inbound<'a> {
     pub async fn get(&self, inbound_id: String) -> Result<InboundConfigOut> {
         crate::request::Request::new(
             http1::Method::GET,
-            "/v1/inbound/{inbound_id}",
+            "/v1/inbound/configs/{inbound_id}",
         )
         .with_path_param("inbound_id", inbound_id)
         .execute(self.cfg)
@@ -80,7 +80,7 @@ impl<'a> Inbound<'a> {
     ) -> Result<InboundConfigOut> {
         crate::request::Request::new(
             http1::Method::PUT,
-            "/v1/inbound/{inbound_id}",
+            "/v1/inbound/configs/{inbound_id}",
         )
         .with_path_param("inbound_id", inbound_id)
         .with_body_param(inbound_config_in)
@@ -92,7 +92,7 @@ impl<'a> Inbound<'a> {
     pub async fn delete(&self, inbound_id: String) -> Result<()> {
         crate::request::Request::new(
             http1::Method::DELETE,
-            "/v1/inbound/{inbound_id}",
+            "/v1/inbound/configs/{inbound_id}",
         )
         .with_path_param("inbound_id", inbound_id)
         .returns_nothing()
