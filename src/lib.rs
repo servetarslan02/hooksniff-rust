@@ -23,6 +23,7 @@ mod models;
 mod request;
 pub mod webhooks;
 pub mod webhook_event;
+pub mod response_metadata;
 
 pub(crate) use connector::{make_connector, Connector};
 
