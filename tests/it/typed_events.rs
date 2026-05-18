@@ -117,3 +117,70 @@ fn test_all_endpoint_event_types() {
         assert_eq!(event.event_type(), event_type);
     }
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// EDGE CASES
+// ═══════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_empty_data() {
+    let event = WebhookEvent {
+        event: "endpoint.created".to_string(),
+        data: serde_json::json!({}),
+        timestamp: "".to_string(),
+    };
+    let data: EndpointCreatedEventData = event.parse_data().unwrap();
+    assert_eq!(data.app_id, "");
+    assert_eq!(data.endpoint_id, "");
+    assert_eq!(data.app_uid, None);
+}
+
+#[test]
+fn test_missing_optional_fields() {
+    let event = WebhookEvent {
+        event: "endpoint.disabled".to_string(),
+        data: serde_json::json!({"appId": "a1", "endpointId": "e1"}),
+        timestamp: "".to_string(),
+    };
+    let data: EndpointDisabledEventData = event.parse_data().unwrap();
+    assert_eq!(data.fail_since, None);
+    assert_eq!(data.trigger, None);
+}
+
+#[test]
+fn test_extra_fields_ignored() {
+    let event = WebhookEvent {
+        event: "endpoint.created".to_string(),
+        data: serde_json::json!({"appId": "a1", "endpointId": "e1", "extra": "ignored"}),
+        timestamp: "".to_string(),
+    };
+    let data: EndpointCreatedEventData = event.parse_data().unwrap();
+    assert_eq!(data.app_id, "a1");
+}
+
+#[test]
+fn test_nested_json_data() {
+    let event = WebhookEvent {
+        event: "message.attempt.exhausted".to_string(),
+        data: serde_json::json!({
+            "appId": "a1",
+            "msgId": "m1",
+            "lastAttempt": {"id": "att", "timestamp": "t", "responseStatusCode": 500}
+        }),
+        timestamp: "".to_string(),
+    };
+    let data: MessageAttemptExhaustedEventData = event.parse_data().unwrap();
+    assert_eq!(data.last_attempt.response_status_code, 500);
+}
+
+#[test]
+fn test_unicode_in_data() {
+    let event = WebhookEvent {
+        event: "endpoint.created".to_string(),
+        data: serde_json::json!({"appId": "ünïcödé", "endpointId": "日本語"}),
+        timestamp: "".to_string(),
+    };
+    let data: EndpointCreatedEventData = event.parse_data().unwrap();
+    assert_eq!(data.app_id, "ünïcödé");
+    assert_eq!(data.endpoint_id, "日本語");
+}
