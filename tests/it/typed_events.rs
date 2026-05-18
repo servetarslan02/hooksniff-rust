@@ -184,3 +184,111 @@ fn test_unicode_in_data() {
     assert_eq!(data.app_id, "ünïcödé");
     assert_eq!(data.endpoint_id, "日本語");
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// SIGNATURE TESTS
+// ═══════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_sign_deterministic() {
+    let wh = super::Webhook::new("whsec_dGVzdA==").unwrap();
+    let sig1 = wh.sign("msg_1", 1700000000, b"payload").unwrap();
+    let sig2 = wh.sign("msg_1", 1700000000, b"payload").unwrap();
+    assert_eq!(sig1, sig2);
+}
+
+#[test]
+fn test_sign_different_payloads() {
+    let wh = super::Webhook::new("whsec_dGVzdA==").unwrap();
+    let sig1 = wh.sign("msg_1", 1700000000, b"p1").unwrap();
+    let sig2 = wh.sign("msg_1", 1700000000, b"p2").unwrap();
+    assert_ne!(sig1, sig2);
+}
+
+#[test]
+fn test_sign_different_secrets() {
+    let wh1 = super::Webhook::new("whsec_dGVzdA==").unwrap();
+    let wh2 = super::Webhook::new("whsec_b3RoZXI=").unwrap();
+    let sig1 = wh1.sign("msg_1", 1700000000, b"p").unwrap();
+    let sig2 = wh2.sign("msg_1", 1700000000, b"p").unwrap();
+    assert_ne!(sig1, sig2);
+}
+
+#[test]
+fn test_sign_format() {
+    let wh = super::Webhook::new("whsec_dGVzdA==").unwrap();
+    let sig = wh.sign("msg_1", 1700000000, b"p").unwrap();
+    assert!(sig.starts_with("v1,"));
+}
+
+#[test]
+fn test_sign_empty_payload() {
+    let wh = super::Webhook::new("whsec_dGVzdA==").unwrap();
+    let sig = wh.sign("msg_1", 1700000000, b"").unwrap();
+    assert!(sig.starts_with("v1,"));
+}
+
+#[test]
+fn test_sign_large_payload() {
+    let wh = super::Webhook::new("whsec_dGVzdA==").unwrap();
+    let large = vec![b'x'; 100000];
+    let sig = wh.sign("msg_1", 1700000000, &large).unwrap();
+    assert!(sig.starts_with("v1,"));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// VERIFY TESTS
+// ═══════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_verify_valid() {
+    let wh = super::Webhook::new("whsec_dGVzdA==").unwrap();
+    let payload = b"{\"event\":\"test\"}";
+    let ts = now();
+    let sig = wh.sign("msg_1", ts, payload).unwrap();
+    let mut headers = http02::HeaderMap::new();
+    headers.insert("webhook-id", "msg_1".parse().unwrap());
+    headers.insert("webhook-timestamp", ts.to_string().parse().unwrap());
+    headers.insert("webhook-signature", sig.parse().unwrap());
+    wh.verify(payload, &headers).unwrap();
+}
+
+#[test]
+fn test_verify_invalid_signature() {
+    let wh = super::Webhook::new("whsec_dGVzdA==").unwrap();
+    let mut headers = http02::HeaderMap::new();
+    headers.insert("webhook-id", "msg_1".parse().unwrap());
+    headers.insert("webhook-timestamp", now().to_string().parse().unwrap());
+    headers.insert("webhook-signature", "v1,invalid".parse().unwrap());
+    assert!(wh.verify(b"{}", &headers).is_err());
+}
+
+#[test]
+fn test_verify_old_timestamp() {
+    let wh = super::Webhook::new("whsec_dGVzdA==").unwrap();
+    let payload = b"{}";
+    let ts = now() - 600;
+    let sig = wh.sign("msg_1", ts, payload).unwrap();
+    let mut headers = http02::HeaderMap::new();
+    headers.insert("webhook-id", "msg_1".parse().unwrap());
+    headers.insert("webhook-timestamp", ts.to_string().parse().unwrap());
+    headers.insert("webhook-signature", sig.parse().unwrap());
+    assert!(wh.verify(payload, &headers).is_err());
+}
+
+#[test]
+fn test_verify_ignoring_timestamp() {
+    let wh = super::Webhook::new("whsec_dGVzdA==").unwrap();
+    let payload = b"{}";
+    let ts = now() - 600;
+    let sig = wh.sign("msg_1", ts, payload).unwrap();
+    let mut headers = http02::HeaderMap::new();
+    headers.insert("webhook-id", "msg_1".parse().unwrap());
+    headers.insert("webhook-timestamp", ts.to_string().parse().unwrap());
+    headers.insert("webhook-signature", sig.parse().unwrap());
+    wh.verify_ignoring_timestamp(payload, &headers).unwrap();
+}
+
+fn now() -> i64 {
+    std::time::UNIX_EPOCH.elapsed().unwrap().as_secs() as i64
+}
