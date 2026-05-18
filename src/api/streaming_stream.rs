@@ -96,3 +96,42 @@ impl<'a> StreamingStream<'a> {
             .await
     }
 }
+
+use futures::stream::TryStreamExt;
+
+impl<'a> StreamingStream<'a> {
+    /// Subscribe to real-time events via SSE on a stream.
+    /// Returns a stream of event strings that can be consumed with `futures::Stream`.
+    pub async fn subscribe(&self, stream_id: String) -> Result<impl futures::Stream<Item = Result<String>>> {
+        let url = format!("{}/v1/stream/{}/subscribe", self.cfg.base_path, stream_id);
+        let client = &self.cfg.client;
+        let resp = client
+            .get(&url)
+            .header("Accept", "text/event-stream")
+            .header("Authorization", format!("Bearer {}", self.cfg.bearer_token))
+            .send()
+            .await?;
+
+        let byte_stream = resp.bytes_stream();
+        let string_stream = byte_stream.map_err(|e| crate::error::Error::Http(e.to_string()))
+            .map_ok(|bytes| String::from_utf8_lossy(&bytes).to_string());
+
+        Ok(string_stream)
+    }
+
+    /// Publish an event to a stream.
+    pub async fn publish(&self, body: crate::models::PublishEventIn) -> Result<crate::models::PublishEventResponse> {
+        crate::request::Request::new(http1::Method::POST, "/v1/stream/events")
+            .with_body(body)
+            .execute(self.cfg)
+            .await
+    }
+
+    /// List subscriptions for a stream.
+    pub async fn list_subscriptions(&self, stream_id: String) -> Result<Vec<crate::models::StreamSubscriptionOut>> {
+        crate::request::Request::new(http1::Method::GET, "/v1/stream/{stream_id}/subscriptions")
+            .with_path_param("stream_id", stream_id)
+            .execute(self.cfg)
+            .await
+    }
+}
