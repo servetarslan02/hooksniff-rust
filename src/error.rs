@@ -140,3 +140,34 @@ pub struct HttpErrorContent<T> {
     pub payload: Option<T>,
     pub headers: Option<std::collections::HashMap<String, String>>,
 }
+
+/// Additional error type constructors for common non-HTTP errors
+impl Error {
+    /// Create a timeout error
+    pub fn timeout(message: impl Into<String>) -> Self {
+        Self::Generic(format!("Timeout: {}", message.into()))
+    }
+
+    /// Create a network error
+    pub fn network(message: impl Into<String>) -> Self {
+        Self::Generic(format!("Network error: {}", message.into()))
+    }
+
+    /// Create an authentication error
+    pub fn authentication(message: impl Into<String>) -> Self {
+        Self::Generic(format!("Authentication error: {}", message.into()))
+    }
+
+    /// Check if this is a 408 Request Timeout error
+    pub fn is_request_timeout(&self) -> bool { self.status_code() == Some(408) }
+    /// Check if this is a 410 Gone error
+    pub fn is_gone(&self) -> bool { self.status_code() == Some(410) }
+    /// Check if this is a 413 Payload Too Large error
+    pub fn is_payload_too_large(&self) -> bool { self.status_code() == Some(413) }
+    /// Check if this is a 501 Not Implemented error
+    pub fn is_not_implemented(&self) -> bool { self.status_code() == Some(501) }
+    /// Check if this is a 507 Insufficient Storage error
+    pub fn is_insufficient_storage(&self) -> bool { self.status_code() == Some(507) }
+    /// Check if this is a 508 Loop Detected error
+    pub fn is_loop_detected(&self) -> bool { self.status_code() == Some(508) }
+}
