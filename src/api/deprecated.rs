@@ -9,6 +9,3 @@ pub type AggregateAppStatsOptions = super::AppUsageStatsIn;
 
 #[deprecated]
 #[derive(Default)]
-pub struct AuthenticationDashboardAccessOptions {
-    pub idempotency_key: Option<String>,
-}

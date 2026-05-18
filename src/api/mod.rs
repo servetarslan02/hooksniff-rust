@@ -10,7 +10,6 @@ pub use crate::models::*;
 mod alert;
 mod analytics;
 mod api_key;
-mod application;
 mod authentication;
 mod audit_log;
 mod background_task;
@@ -53,9 +52,8 @@ pub use self::{
     alert::{Alert, AlertCreateOptions, AlertListOptions},
     analytics::{Analytics, AnalyticsAggregateOptions},
     api_key::{ApiKey, ApiKeyCreateOptions, ApiKeyListOptions},
-    application::{Application, ApplicationCreateOptions, ApplicationListOptions},
     authentication::{
-        Authentication, AuthenticationAppPortalAccessOptions, AuthenticationExpireAllOptions,
+        Authentication, 
         AuthenticationLogoutOptions, AuthenticationRotateStreamPollerTokenOptions,
         AuthenticationStreamExpireAllOptions, AuthenticationStreamLogoutOptions,
         AuthenticationStreamPortalAccessOptions,
@@ -144,8 +142,6 @@ impl HookSniff {
         ApiKey::new(&self.cfg)
     }
 
-    pub fn application(&self) -> Application<'_> {
-        Application::new(&self.cfg)
     }
 
     pub fn authentication(&self) -> Authentication<'_> {
