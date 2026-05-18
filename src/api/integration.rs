@@ -32,10 +32,9 @@ impl<'a> Integration<'a> {
         Self { cfg }
     }
 
-    /// List the application's integrations.
+    /// List all integrations.
     pub async fn list(
         &self,
-        app_id: String,
         options: Option<IntegrationListOptions>,
     ) -> Result<ListResponseIntegrationOut> {
         let IntegrationListOptions {
@@ -44,8 +43,7 @@ impl<'a> Integration<'a> {
             order,
         } = options.unwrap_or_default();
 
-        crate::request::Request::new(http1::Method::GET, "/v1/app/{app_id}/integration")
-            .with_path_param("app_id", app_id)
+        crate::request::Request::new(http1::Method::GET, "/v1/integrations")
             .with_optional_query_param("limit", limit)
             .with_optional_query_param("iterator", iterator)
             .with_optional_query_param("order", order)
@@ -56,14 +54,12 @@ impl<'a> Integration<'a> {
     /// Create an integration.
     pub async fn create(
         &self,
-        app_id: String,
         integration_in: IntegrationIn,
         options: Option<IntegrationCreateOptions>,
     ) -> Result<IntegrationOut> {
         let IntegrationCreateOptions { idempotency_key } = options.unwrap_or_default();
 
-        crate::request::Request::new(http1::Method::POST, "/v1/app/{app_id}/integration")
-            .with_path_param("app_id", app_id)
+        crate::request::Request::new(http1::Method::POST, "/v1/integrations")
             .with_optional_header_param("idempotency-key", idempotency_key)
             .with_body_param(integration_in)
             .execute(self.cfg)
@@ -71,12 +67,11 @@ impl<'a> Integration<'a> {
     }
 
     /// Get an integration.
-    pub async fn get(&self, app_id: String, integ_id: String) -> Result<IntegrationOut> {
+    pub async fn get(&self, integ_id: String) -> Result<IntegrationOut> {
         crate::request::Request::new(
             http1::Method::GET,
-            "/v1/app/{app_id}/integration/{integ_id}",
+            "/v1/integrations/{integ_id}",
         )
-        .with_path_param("app_id", app_id)
         .with_path_param("integ_id", integ_id)
         .execute(self.cfg)
         .await
@@ -85,15 +80,13 @@ impl<'a> Integration<'a> {
     /// Update an integration.
     pub async fn update(
         &self,
-        app_id: String,
         integ_id: String,
         integration_update: IntegrationUpdate,
     ) -> Result<IntegrationOut> {
         crate::request::Request::new(
             http1::Method::PUT,
-            "/v1/app/{app_id}/integration/{integ_id}",
+            "/v1/integrations/{integ_id}",
         )
-        .with_path_param("app_id", app_id)
         .with_path_param("integ_id", integ_id)
         .with_body_param(integration_update)
         .execute(self.cfg)
@@ -101,27 +94,13 @@ impl<'a> Integration<'a> {
     }
 
     /// Delete an integration.
-    pub async fn delete(&self, app_id: String, integ_id: String) -> Result<()> {
+    pub async fn delete(&self, integ_id: String) -> Result<()> {
         crate::request::Request::new(
             http1::Method::DELETE,
-            "/v1/app/{app_id}/integration/{integ_id}",
+            "/v1/integrations/{integ_id}",
         )
-        .with_path_param("app_id", app_id)
         .with_path_param("integ_id", integ_id)
         .returns_nothing()
-        .execute(self.cfg)
-        .await
-    }
-
-    /// Get an integration's key.
-    #[deprecated]
-    pub async fn get_key(&self, app_id: String, integ_id: String) -> Result<IntegrationKeyOut> {
-        crate::request::Request::new(
-            http1::Method::GET,
-            "/v1/app/{app_id}/integration/{integ_id}/key",
-        )
-        .with_path_param("app_id", app_id)
-        .with_path_param("integ_id", integ_id)
         .execute(self.cfg)
         .await
     }
@@ -130,7 +109,6 @@ impl<'a> Integration<'a> {
     /// revoked.
     pub async fn rotate_key(
         &self,
-        app_id: String,
         integ_id: String,
         options: Option<IntegrationRotateKeyOptions>,
     ) -> Result<IntegrationKeyOut> {
@@ -138,9 +116,8 @@ impl<'a> Integration<'a> {
 
         crate::request::Request::new(
             http1::Method::POST,
-            "/v1/app/{app_id}/integration/{integ_id}/key/rotate",
+            "/v1/integrations/{integ_id}/key/rotate",
         )
-        .with_path_param("app_id", app_id)
         .with_path_param("integ_id", integ_id)
         .with_optional_header_param("idempotency-key", idempotency_key)
         .execute(self.cfg)
