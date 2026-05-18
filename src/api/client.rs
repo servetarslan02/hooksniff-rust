@@ -134,7 +134,7 @@ mod tests {
 
         let hooksniff = HookSniff::new(String::new(), None);
         let message_api = hooksniff.message();
-        let fut = message_api.expunge_content(String::new(), String::new());
+        let fut = message_api.expunge_content(String::new());
         require_send_sync(fut);
     }
 }

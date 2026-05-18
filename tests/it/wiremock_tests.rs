@@ -12,7 +12,7 @@ async fn test_urlencoded_octothorpe() {
     let json_body =
         r#"{"data":[],"done":true,"iterator":"iterator-str","prevIterator":"prevIterator-str"}"#;
     Mock::given(method("GET"))
-        .and(path("/api/v1/app/app_id/msg"))
+        .and(path("/v1/webhooks"))
         .respond_with(ResponseTemplate::new(200).set_body_string(json_body))
         .mount(&mock_server)
         .await;
@@ -27,7 +27,6 @@ async fn test_urlencoded_octothorpe() {
 
     svx.message()
         .list(
-            "app_id".to_string(),
             Some(MessageListOptions {
                 tag: Some("test#test".into()),
                 ..Default::default()
@@ -51,7 +50,7 @@ async fn test_idempotency_key_is_sent_for_create_request() {
 
     let json_body = r#"{"uid":"unique-identifier","name":"My first application","rateLimit":0,"id":"app_1srOrx2ZWZBpBUvZwXKQmoEYga2","createdAt":"2019-08-24T14:15:22Z","updatedAt":"2019-08-24T14:15:22Z","metadata":{"property1":"string","property2":"string"}}"#;
     Mock::given(method("POST"))
-        .and(path("/api/v1/app"))
+        .and(path("/v1/applications"))
         .respond_with(ResponseTemplate::new(200).set_body_string(json_body))
         .mount(&mock_server)
         .await;
@@ -91,7 +90,7 @@ async fn test_client_provided_idempotency_key_is_not_overridden() {
 
     let json_body = r#"{"uid":"unique-identifier","name":"My first application","rateLimit":0,"id":"app_1srOrx2ZWZBpBUvZwXKQmoEYga2","createdAt":"2019-08-24T14:15:22Z","updatedAt":"2019-08-24T14:15:22Z","metadata":{"property1":"string","property2":"string"}}"#;
     Mock::given(method("POST"))
-        .and(path("/api/v1/app"))
+        .and(path("/v1/applications"))
         .respond_with(ResponseTemplate::new(200).set_body_string(json_body))
         .mount(&mock_server)
         .await;
@@ -139,7 +138,7 @@ async fn test_unknown_keys_are_ignored() {
     let json_body =
         r#"{"data":[],"done":true,"iterator":null,"prevIterator":null,"extra-key":"ignored"}"#;
     Mock::given(method("GET"))
-        .and(path("/api/v1/app"))
+        .and(path("/v1/applications"))
         .respond_with(ResponseTemplate::new(200).set_body_string(json_body))
         .expect(1)
         .mount(&mock_server)

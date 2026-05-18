@@ -73,7 +73,6 @@ async fn test_endpoint_crud() {
     let ep = client
         .endpoint()
         .create(
-            app.id.clone(),
             EndpointIn {
                 channels: Some(vec![String::from("ch0"), String::from("ch1")]),
                 url: String::from("https://example.hooksniff.com/"),
@@ -94,7 +93,6 @@ async fn test_endpoint_crud() {
     let ep_patched = client
         .endpoint()
         .patch(
-            app.id.clone(),
             ep.id.clone(),
             EndpointPatch {
                 filter_types: JsOption::Some(vec![
@@ -125,7 +123,7 @@ async fn test_endpoint_crud() {
     // correctly.
     client
         .endpoint()
-        .delete(app.id.clone(), ep.id)
+        .delete(ep.id)
         .await
         .unwrap();
 
@@ -137,7 +135,7 @@ async fn test_default_retries() {
     let mock_server: MockServer = MockServer::start().await;
 
     Mock::given(wiremock::matchers::method("POST"))
-        .and(wiremock::matchers::path("/api/v1/app"))
+        .and(wiremock::matchers::path("/v1/applications"))
         .respond_with(ResponseTemplate::new(500))
         .up_to_n_times(1)
         .expect(1)
@@ -145,7 +143,7 @@ async fn test_default_retries() {
         .await;
 
     Mock::given(wiremock::matchers::method("POST"))
-        .and(wiremock::matchers::path("/api/v1/app"))
+        .and(wiremock::matchers::path("/v1/applications"))
         .and(wiremock::matchers::header("hooksniff-retry-count", 1))
         .and(wiremock::matchers::header_exists("hooksniff-req-id"))
         .respond_with(ResponseTemplate::new(500))
@@ -155,7 +153,7 @@ async fn test_default_retries() {
         .await;
 
     Mock::given(wiremock::matchers::method("POST"))
-        .and(wiremock::matchers::path("/api/v1/app"))
+        .and(wiremock::matchers::path("/v1/applications"))
         .and(wiremock::matchers::header("hooksniff-retry-count", 2))
         .respond_with(ResponseTemplate::new(500))
         .up_to_n_times(1)
@@ -194,7 +192,7 @@ async fn test_custom_retries() {
     let num_retries = 6;
 
     Mock::given(wiremock::matchers::method("POST"))
-        .and(wiremock::matchers::path("/api/v1/app"))
+        .and(wiremock::matchers::path("/v1/applications"))
         .respond_with(ResponseTemplate::new(500))
         .up_to_n_times(1)
         .expect(1)
@@ -203,7 +201,7 @@ async fn test_custom_retries() {
 
     for i in 1..=num_retries {
         Mock::given(wiremock::matchers::method("POST"))
-            .and(wiremock::matchers::path("/api/v1/app"))
+            .and(wiremock::matchers::path("/v1/applications"))
             .and(wiremock::matchers::header("hooksniff-retry-count", i))
             .respond_with(ResponseTemplate::new(500))
             .up_to_n_times(1)
@@ -246,7 +244,7 @@ async fn test_custom_retry_schedule() {
     let retry_schedule = retry_schedule_in_ms.map(Duration::from_millis).into();
 
     Mock::given(wiremock::matchers::method("POST"))
-        .and(wiremock::matchers::path("/api/v1/app"))
+        .and(wiremock::matchers::path("/v1/applications"))
         .respond_with(ResponseTemplate::new(500))
         .up_to_n_times(1)
         .expect(1)
@@ -255,7 +253,7 @@ async fn test_custom_retry_schedule() {
 
     for i in 1..=retry_schedule_in_ms.len() {
         Mock::given(wiremock::matchers::method("POST"))
-            .and(wiremock::matchers::path("/api/v1/app"))
+            .and(wiremock::matchers::path("/v1/applications"))
             .and(wiremock::matchers::header("hooksniff-retry-count", i))
             .respond_with(ResponseTemplate::new(500))
             .up_to_n_times(1)
