@@ -38,10 +38,10 @@ use hooksniff::api::HookSniff;
 async fn main() {
     let client = HookSniff::new("your-api-token".to_string(), None);
 
-    // List applications
-    let apps = client.application().list(None).await.unwrap();
-    for app in apps.data {
-        println!("App: {} ({})", app.name, app.id);
+    // List endpoints
+    let endpoints = client.endpoint().list(None).await.unwrap();
+    for ep in endpoints.data {
+        println!("Endpoint: {} ({})", ep.id, ep.url);
     }
 }
 ```
@@ -50,7 +50,6 @@ async fn main() {
 
 | Resource | Method | Description |
 |----------|--------|-------------|
-| `application()` | CRUD | Manage applications |
 | `endpoint()` | CRUD | Manage webhook endpoints |
 | `message()` | CRUD | Send and manage messages |
 | `message_attempt()` | CRUD | Track delivery attempts |
