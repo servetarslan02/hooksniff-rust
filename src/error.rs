@@ -26,6 +26,58 @@ impl Error {
         Self::Generic(format!("{err:?}"))
     }
 
+    /// Get the HTTP status code if this is an HTTP error
+    pub fn status_code(&self) -> Option<u16> {
+        match self {
+            Error::Http(e) => Some(e.status.as_u16()),
+            Error::Validation(_) => Some(422),
+            Error::Generic(_) => None,
+        }
+    }
+
+    /// Get response headers if available
+    pub fn headers(&self) -> Option<&std::collections::HashMap<String, String>> {
+        match self {
+            Error::Http(e) => e.headers.as_ref(),
+            Error::Validation(e) => e.headers.as_ref(),
+            Error::Generic(_) => None,
+        }
+    }
+
+    /// Check if this is a 400 Bad Request error
+    pub fn is_bad_request(&self) -> bool { self.status_code() == Some(400) }
+    /// Check if this is a 401 Unauthorized error
+    pub fn is_unauthorized(&self) -> bool { self.status_code() == Some(401) }
+    /// Check if this is a 403 Forbidden error
+    pub fn is_forbidden(&self) -> bool { self.status_code() == Some(403) }
+    /// Check if this is a 404 Not Found error
+    pub fn is_not_found(&self) -> bool { self.status_code() == Some(404) }
+    /// Check if this is a 409 Conflict error
+    pub fn is_conflict(&self) -> bool { self.status_code() == Some(409) }
+    /// Check if this is a 422 Validation error
+    pub fn is_validation_error(&self) -> bool { self.status_code() == Some(422) }
+    /// Check if this is a 429 Rate Limit error
+    pub fn is_rate_limited(&self) -> bool { self.status_code() == Some(429) }
+    /// Check if this is a 500 Internal Server Error
+    pub fn is_internal_server_error(&self) -> bool { self.status_code() == Some(500) }
+    /// Check if this is a 502 Bad Gateway error
+    pub fn is_bad_gateway(&self) -> bool { self.status_code() == Some(502) }
+    /// Check if this is a 503 Service Unavailable error
+    pub fn is_service_unavailable(&self) -> bool { self.status_code() == Some(503) }
+    /// Check if this is a 504 Gateway Timeout error
+    pub fn is_gateway_timeout(&self) -> bool { self.status_code() == Some(504) }
+    /// Check if this is any 5xx server error
+    pub fn is_server_error(&self) -> bool { self.status_code().map_or(false, |s| s >= 500) }
+    /// Check if this is any 4xx client error
+    pub fn is_client_error(&self) -> bool { self.status_code().map_or(false, |s| s >= 400 && s < 500) }
+
+    /// Get the Retry-After value from headers (for 429 errors)
+    pub fn retry_after(&self) -> Option<u64> {
+        self.headers()
+            .and_then(|h| h.get("retry-after"))
+            .and_then(|v| v.parse().ok())
+    }
+
     pub(crate) async fn from_response(
         status_code: http1::StatusCode,
         body: Incoming,
