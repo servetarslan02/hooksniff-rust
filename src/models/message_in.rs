@@ -22,34 +22,35 @@ pub struct MessageIn {
     /// no more than 24 hours in the future.
     ///
     /// RFC3339 date string.
-    #[serde(rename = "deliverAt")]
+    #[serde(rename = "deliver_at")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deliver_at: Option<String>,
 
     /// Optional unique identifier for the message
-    #[serde(rename = "eventId")]
+    #[serde(rename = "event_id")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event_id: Option<String>,
 
     /// The event type's name
-    #[serde(rename = "eventType")]
+    #[serde(rename = "event")]
     pub event_type: String,
 
     /// JSON payload to send as the request body of the webhook.
     ///
     /// We also support sending non-JSON payloads. Please contact us for more
     /// information.
+    #[serde(rename = "data")]
     pub payload: serde_json::Value,
 
     /// Optional number of hours to retain the message payload. Note that this
     /// is mutually exclusive with `payloadRetentionPeriod`.
-    #[serde(rename = "payloadRetentionHours")]
+    #[serde(rename = "payload_retention_hours")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub payload_retention_hours: Option<i32>,
 
     /// Optional number of days to retain the message payload. Defaults to 90.
     /// Note that this is mutually exclusive with `payloadRetentionHours`.
-    #[serde(rename = "payloadRetentionPeriod")]
+    #[serde(rename = "payload_retention_period")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub payload_retention_period: Option<i32>,
 
