@@ -1,47 +1,11 @@
-// SPDX-FileCopyrightText: © 2022 HookSniff Authors
-// SPDX-License-Identifier: MIT
+#![allow(unused_imports)]
+#![allow(clippy::too_many_arguments)]
 
-//! Rust client library for HookSniff.
-//!
-//! The main entry points of this library are the API client [`api::HookSniff`], and
-//! [`webhooks::Webhook`].
+extern crate serde_repr;
+extern crate serde;
+extern crate serde_json;
+extern crate url;
+extern crate reqwest;
 
-#![forbid(unsafe_code)]
-
-use std::time::Duration;
-
-use hyper::body::Bytes;
-use hyper_util::client::legacy::Client as HyperClient;
-
-pub mod api;
-mod api_internal;
-pub mod autoconfig;
-mod connector;
-pub mod error;
-mod model_ext;
-mod models;
-mod request;
-pub mod webhooks;
-pub mod webhook_event;
-pub mod response_metadata;
-pub mod config;
-
-pub(crate) use connector::{make_connector, Connector};
-
-pub struct Configuration {
-    pub base_path: String,
-    pub user_agent: Option<String>,
-    pub bearer_access_token: Option<String>,
-    pub timeout: Option<Duration>,
-    pub num_retries: u32,
-    pub retry_schedule: Option<Vec<Duration>>,
-
-    client: HyperClient<Connector, http_body_util::Full<Bytes>>,
-}
-
-/// Convert a `StatusCode` from the http crate v1 to one from the http crate
-/// v0.2.
-fn http1_to_02_status_code(code: http1::StatusCode) -> http02::StatusCode {
-    http02::StatusCode::from_u16(code.as_u16())
-        .expect("both versions of the http crate enforce the same numerical limits for StatusCode")
-}
+pub mod apis;
+pub mod models;
