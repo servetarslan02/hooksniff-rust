@@ -27,6 +27,8 @@ pub struct SubscriptionResponse {
     pub retention_days: i32,
     #[serde(rename = "monthly_price_cents")]
     pub monthly_price_cents: i64,
+    #[serde(rename = "stripe_subscription_id", skip_serializing_if = "Option::is_none")]
+    pub stripe_subscription_id: Option<String>,
 }
 
 impl SubscriptionResponse {

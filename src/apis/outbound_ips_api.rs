@@ -18,12 +18,12 @@ use super::{Error, configuration, ContentType};
 /// struct for typed errors of method [`outbound_ips_get`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum OutboundIpsGetError {
+pub enum OutboundIPsGetError {
     UnknownValue(serde_json::Value),
 }
 
 
-pub async fn outbound_ips_get(configuration: &configuration::Configuration, ) -> Result<models::OutboundIPsResponse, Error<OutboundIpsGetError>> {
+pub async fn outbound_ips_get(configuration: &configuration::Configuration, ) -> Result<models::OutboundIPsResponse, Error<OutboundIPsGetError>> {
 
     let uri_str = format!("{}/outbound-ips", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
@@ -52,7 +52,7 @@ pub async fn outbound_ips_get(configuration: &configuration::Configuration, ) ->
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<OutboundIpsGetError> = serde_json::from_str(&content).ok();
+        let entity: Option<OutboundIPsGetError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent { status, content, entity }))
     }
 }

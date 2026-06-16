@@ -31,6 +31,8 @@ pub struct CreateEndpointRequest {
     pub fallback_url: Option<String>,
     #[serde(rename = "format", skip_serializing_if = "Option::is_none")]
     pub format: Option<Format>,
+    #[serde(rename = "application_id", skip_serializing_if = "Option::is_none")]
+    pub application_id: Option<String>,
 }
 
 impl CreateEndpointRequest {
@@ -45,6 +47,7 @@ impl CreateEndpointRequest {
             routing_strategy: None,
             fallback_url: None,
             format: None,
+            application_id: None,
         }
     }
 }
