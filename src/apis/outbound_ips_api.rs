@@ -23,7 +23,7 @@ pub enum OutboundIpsGetError {
 }
 
 
-pub async fn outbound_ips_get(configuration: &configuration::Configuration, ) -> Result<models::OutboundIpsResponse, Error<OutboundIpsGetError>> {
+pub async fn outbound_ips_get(configuration: &configuration::Configuration, ) -> Result<models::OutboundIPsResponse, Error<OutboundIpsGetError>> {
 
     let uri_str = format!("{}/outbound-ips", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
@@ -47,8 +47,8 @@ pub async fn outbound_ips_get(configuration: &configuration::Configuration, ) ->
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::OutboundIpsResponse`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::OutboundIpsResponse`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::OutboundIPsResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::OutboundIPsResponse`")))),
         }
     } else {
         let content = resp.text().await?;

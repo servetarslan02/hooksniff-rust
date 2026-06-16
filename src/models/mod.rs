@@ -249,7 +249,7 @@ pub use self::o_auth_provider::OAuthProvider;
 pub mod o_auth_provider_list_response;
 pub use self::o_auth_provider_list_response::OAuthProviderListResponse;
 pub mod outbound_ips_response;
-pub use self::outbound_ips_response::OutboundIpsResponse;
+pub use self::outbound_ips_response::OutboundIPsResponse;
 pub mod paginated_users;
 pub use self::paginated_users::PaginatedUsers;
 pub mod platform_settings;

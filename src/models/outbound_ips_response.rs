@@ -11,18 +11,18 @@
 use crate::models;
 use serde::{Deserialize, Serialize};
 
-/// OutboundIpsResponse : List of static outbound IP addresses for firewall whitelisting
+/// OutboundIPsResponse : List of static outbound IP addresses for firewall whitelisting
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct OutboundIpsResponse {
+pub struct OutboundIPsResponse {
     /// IPv4 and IPv6 addresses used for outbound requests
     #[serde(rename = "ips")]
     pub ips: Vec<String>,
 }
 
-impl OutboundIpsResponse {
+impl OutboundIPsResponse {
     /// List of static outbound IP addresses for firewall whitelisting
-    pub fn new(ips: Vec<String>) -> OutboundIpsResponse {
-        OutboundIpsResponse {
+    pub fn new(ips: Vec<String>) -> OutboundIPsResponse {
+        OutboundIPsResponse {
             ips,
         }
     }

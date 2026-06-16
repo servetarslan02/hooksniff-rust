@@ -10,7 +10,7 @@ Method | HTTP request | Description
 
 ## outbound_ips_get
 
-> models::OutboundIpsResponse outbound_ips_get()
+> models::OutboundIPsResponse outbound_ips_get()
 Get outbound IP addresses for firewall whitelisting
 
 ### Parameters
@@ -19,7 +19,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**models::OutboundIpsResponse**](OutboundIpsResponse.md)
+[**models::OutboundIPsResponse**](OutboundIPsResponse.md)
 
 ### Authorization
 
